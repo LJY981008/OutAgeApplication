@@ -1,5 +1,6 @@
 package com.example.outageapplication
 
+import android.animation.ObjectAnimator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
+    private var isFabOpen = false
     val tabTextList = arrayListOf("시설", "이력", "조회")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +33,37 @@ class MainActivity : AppCompatActivity() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabTextList[position]
         }.attach()
+
+        binding.fabMain.setOnClickListener {
+            toggleFab()
+        }
     }
+
+    private fun toggleFab(){
+        if(isFabOpen){
+            ObjectAnimator.ofFloat(binding.fabA, "translationY", 0f).apply { start() }
+            ObjectAnimator.ofFloat(binding.fabB, "translationY", 0f).apply { start() }
+            isFabOpen = false;
+            //binding.fabMain.setImageResource(R.drawable.) 눌렀을 때 바뀔 이미지 구하기
+        }
+        else{
+            ObjectAnimator.ofFloat(binding.fabA, "translationY", -200f).apply { start() }
+            ObjectAnimator.ofFloat(binding.fabB, "translationY", -400f).apply { start() }
+            isFabOpen = true
+            //binding.fabMain.setImageResource(R.drawable.) 눌렀을 때 바뀔 이미지 구하기
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     override fun onBackPressed() {
         if(viewPager.currentItem ==0){

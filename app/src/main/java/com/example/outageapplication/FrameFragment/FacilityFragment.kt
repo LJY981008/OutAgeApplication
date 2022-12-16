@@ -23,6 +23,7 @@ class FacilityFragment : Fragment() {
     ): View? {
         binding = FragmentFacilityBinding.inflate(inflater, container, false)
 
+
         return binding.root
     }
 

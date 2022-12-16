@@ -39,5 +39,34 @@
             android:layout_height="wrap_content"
             />
     </com.google.android.material.tabs.TabLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:fabSize="mini"
+        app:layout_constraintTop_toTopOf="@id/fabMain"
+        app:layout_constraintBottom_toBottomOf="@id/fabMain"
+        app:layout_constraintStart_toStartOf="@id/fabMain"
+        app:layout_constraintEnd_toEndOf="@id/fabMain"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:fabSize="mini"
+        app:layout_constraintTop_toTopOf="@id/fabMain"
+        app:layout_constraintBottom_toBottomOf="@id/fabMain"
+        app:layout_constraintStart_toStartOf="@id/fabMain"
+        app:layout_constraintEnd_toEndOf="@id/fabMain"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="55dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
