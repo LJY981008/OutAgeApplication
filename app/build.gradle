@@ -2,7 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 android {
     compileSdk 32
 
@@ -14,6 +15,13 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "URL_WaterQuality", properties["url.WaterQuality"]
+        buildConfigField "String", "ENDPOINT_GET_WaterQuality_STATUS", properties["endPoint.getWaterQualityStatus"]
+        buildConfigField "String", "API_KEY", properties["api.key"]
+        buildConfigField "String", "URL_Facility", properties["url.WaterSupplyFacility"]
+        buildConfigField "String", "ENDPOINT_GET_FACILITY_STATUS", properties["endPoint.getWaterSupplyFacilityStatus"]
+        buildConfigField "String", "API_FACILITY_KEY", properties["api.WaterSupplyFacilityKey"]
     }
 
     buildTypes {
@@ -35,6 +43,15 @@ android {
 }
 
 dependencies {
+
+    implementation 'com.squareup.retrofit2:retrofit:2.6.4'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.4'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'io.github.ParkSangGwon:tedpermission-rx3:3.3.0'
+
+
+    implementation "com.google.android.gms:play-services-location:16.0.0"
+    implementation 'com.google.android.gms:play-services:12.0.1'
     implementation 'com.naver.maps:map-sdk:3.16.0'
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
