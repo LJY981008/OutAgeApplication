@@ -23,19 +23,20 @@ data class Facility(
     @SerializedName("준공일자") val completionDate:String,
     @SerializedName("지정일자") val appointedDate:String,
 ){
-    var map = mapOf<String, String>(
-        "Scale" to scale,
-        "Date" to date,
-        "Quality" to quality,
-        "Division" to division,
-        "Num" to num,
-        "Dong" to dong,
-        "Address" to address,
-        "BuildName" to buildName,
-        "CompletionDate" to completionDate,
-        "AppointedDate" to appointedDate
-    )
+
     fun getFacilityMap(): Map<String, String> {
+        var map = mapOf<String, String>(
+            "Scale" to scale,
+            "Date" to date,
+            "Quality" to quality,
+            "Division" to division,
+            "Num" to num,
+            "Dong" to dong,
+            "Address" to address,
+            "BuildName" to buildName,
+            "CompletionDate" to completionDate,
+            "AppointedDate" to appointedDate
+        )
         return map
     }
 }

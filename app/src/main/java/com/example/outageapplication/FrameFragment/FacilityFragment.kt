@@ -1,26 +1,19 @@
 package com.example.outageapplication.FrameFragment
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Location
-import android.location.LocationRequest
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.outageapplication.Data.FacilityBody
 import com.example.outageapplication.Interface.RetrofitFacilityObject
 import com.example.outageapplication.MainActivity
-import com.example.outageapplication.R
+import com.example.outageapplication.Util.LoadingDialog
 import com.example.outageapplication.databinding.FragmentFacilityBinding
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-import com.google.android.gms.location.LocationServices
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
@@ -37,15 +30,15 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     }
 
     private val marker = Marker()
-    private val marker1 = Marker()
-    private val marker2 = Marker()
+    private var markers:MutableList<Marker> = arrayListOf()
 
 
     private lateinit var binding: FragmentFacilityBinding
     private lateinit var mapView: MapView
-    private lateinit var mapData: MutableList<Map<String, String>>
+    private var mapData: MutableList<Map<String, String>> = arrayListOf()
     private lateinit var locationSource: FusedLocationSource
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var geocoder = Geocoder(MainActivity.mainContext)
+    //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,14 +59,16 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
      */
     private fun getMapFacilityData() {
         Log.d("함수", "호출")
-        RetrofitFacilityObject.getApiFacilityService().getInfo(1, 10)
+        RetrofitFacilityObject.getApiFacilityService().getInfo(10, 1)
             .enqueue(object : Callback<FacilityBody> {
                 override fun onResponse(
                     call: Call<FacilityBody>,
                     response: Response<FacilityBody>
                 ) {
                     Log.d("성공", response.message() + response.code())
-                    setMap(response.code(), response.body()!!)
+                    if (response.code() == 200) {
+                        setMap(response.body()!!)
+                    }
                 }
 
                 override fun onFailure(call: Call<FacilityBody>, t: Throwable) {
@@ -86,26 +81,49 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     /**
      * 호출한 데이터 지도에 적용
      */
-    private fun setMap(code: Int, context: FacilityBody) {
+    private fun setMap(context: FacilityBody) {
 
-        context.data[0].getFacilityMap()
-        /*for(i:Int in 0..n!!){
-            Log.d("포문", i.toString())
-            //mapData.add(context.data[i].getFacilityMap())
-            mapData[i]["map"]?.let {
-                Log.d("${i}번", it)
-            }
-        }*/
+        val loadingDialog = LoadingDialog(MainActivity.mainContext)
+        loadingDialog.show()
+        context.data.forEach {
+            mapData.add(it.getFacilityMap())
+            Log.d("위치", it.address)
+            var trans = transAddress(it.address)
+            Log.d("좌표", trans.latitude.toString() + " " + trans.longitude.toString())
+            val tmpMarker = Marker()
+            tmpMarker.position = LatLng(trans.latitude, trans.longitude)
+            tmpMarker.map = naverMap
+            tmpMarker.icon = MarkerIcons.BLUE
+            tmpMarker.iconTintColor = Color.BLUE
+            markers.add(tmpMarker)
+        }
+        loadingDialog.dismiss()
+
     }
+
+    fun transAddress(address: String): Address {
+        val cor = geocoder.getFromLocationName(address, 1)
+        return cor[0]
+    }
+
 
     override fun onMapReady(nMap: NaverMap) {
         naverMap = nMap
+        var standardLatitude = 37.5125            //기준경도
+        var standardLongitude = 127.102778        //기준위도
         var camPos = CameraPosition(
-            LatLng(34.38, 128.55),
-            20.0
+            LatLng(standardLatitude, standardLongitude),
+            10.0
         )
         naverMap.cameraPosition = camPos
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.mainContext) //gps 자동으로 받아오기
+        // 기준위치에 마커 표시
+        marker.position = LatLng(standardLatitude, standardLongitude)
+        marker.map = naverMap
+        marker.icon = MarkerIcons.BLACK
+        marker.iconTintColor = Color.RED
+
+        // 현재 내위치에 마커 찍는 기능
+        /*fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.mainContext) //gps 자동으로 받아오기
         if (ActivityCompat.checkSelfPermission(
                 MainActivity.mainContext,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -127,9 +145,7 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
                 marker.icon = MarkerIcons.BLACK
                 marker.iconTintColor = Color.RED
             }
-        }
+            addOnLocationChangeListener() //위치변경
+        }*/
     }
-
-
-
 }
