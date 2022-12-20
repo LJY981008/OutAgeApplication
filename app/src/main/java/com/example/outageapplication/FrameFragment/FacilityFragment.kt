@@ -1,4 +1,6 @@
 package com.example.outageapplication.FrameFragment
+import androidx.appcompat.app.AlertDialog
+import android.content.DialogInterface
 
 import android.graphics.Color
 import android.location.Address
@@ -38,6 +40,7 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     private var mapData: MutableList<Map<String, String>> = arrayListOf()
     private lateinit var locationSource: FusedLocationSource
     private var geocoder = Geocoder(MainActivity.mainContext)
+    private val dialog = LoadingDialog()
     //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreateView(
@@ -49,7 +52,7 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         locationSource = FusedLocationSource(this, 1000)
-
+        dialog.show(this.childFragmentManager, "tag")
         getMapFacilityData()
         return binding.root
     }
@@ -81,15 +84,12 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     /**
      * 호출한 데이터 지도에 적용
      */
-    private fun setMap(context: FacilityBody) {
+    private fun setMap(content: FacilityBody) {
 
-        val loadingDialog = LoadingDialog(MainActivity.mainContext)
-        loadingDialog.show()
-        context.data.forEach {
+
+        content.data.forEach {
             mapData.add(it.getFacilityMap())
-            Log.d("위치", it.address)
             var trans = transAddress(it.address)
-            Log.d("좌표", trans.latitude.toString() + " " + trans.longitude.toString())
             val tmpMarker = Marker()
             tmpMarker.position = LatLng(trans.latitude, trans.longitude)
             tmpMarker.map = naverMap
@@ -97,7 +97,8 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
             tmpMarker.iconTintColor = Color.BLUE
             markers.add(tmpMarker)
         }
-        loadingDialog.dismiss()
+
+        dialog.dismiss()
 
     }
 

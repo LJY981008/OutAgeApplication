@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         mainContext = this
         viewPager = binding.viewPager
         tabLayout = binding.tabLayout
+
 
         if(isPermitted()) {
         }
