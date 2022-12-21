@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.outageapplication.FrameFragment.FacilityFragment
@@ -57,7 +58,13 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, permissions, 99)
         }
 
-        viewPager.adapter = ScreenSlidePagerAdapter(this)
+        //viewPager.adapter = ScreenSlidePagerAdapter(this)
+        val adapter = PagerFragmentStateAdapter(this)
+        adapter.addFragment(FacilityFragment())
+        adapter.addFragment(RecordFragment())
+        adapter.addFragment(QualityFragment())
+        viewPager.adapter = adapter
+        viewPager.isUserInputEnabled = false    // 스와이프 방지
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabTextList[position]
         }.attach()
@@ -70,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun isPermitted(): Boolean {
+    private fun isPermitted(): Boolean {
         for (perm in permissions) {
             if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
                 return false
@@ -94,15 +101,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private inner class ScreenSlidePagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
-        override fun getItemCount(): Int = 3 // 페이지 수 리턴
-        override fun createFragment(position: Int): Fragment {
-            return when(position){ // 페이지 포지션에 따라 그에 맞는 프래그먼트를 보여줌
-                0 -> FacilityFragment()
-                1 -> RecordFragment()
-                else -> QualityFragment()
-            }
-        }
-    }
+    private inner class PagerFragmentStateAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity){
+       var fragments : ArrayList<Fragment> = ArrayList()
 
+       override fun getItemCount(): Int {
+           return fragments.size
+       }
+
+       override fun createFragment(position: Int): Fragment {
+           return fragments[position]
+       }
+
+       fun addFragment(fragment: Fragment){
+           fragments.add(fragment)
+           notifyItemInserted(fragments.size - 1)
+       }
+
+       fun removeFragment(){
+           fragments.removeLast()
+           notifyItemRemoved(fragments.size)
+       }
+   }
 }

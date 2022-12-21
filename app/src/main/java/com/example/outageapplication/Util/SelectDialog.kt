@@ -15,8 +15,10 @@ import com.example.outageapplication.databinding.FragmentSelectDialogBinding
 class SelectDialog : DialogFragment() {
     private lateinit var binding: FragmentSelectDialogBinding
     private lateinit var spinner: Spinner
-    private val items: Array<String> = arrayOf(
-        "송파구", "2", "3"
+    private var items = arrayOf(
+        "송파구",
+        "1",
+        "2"
     )
 
     override fun onCreateView(
@@ -27,37 +29,9 @@ class SelectDialog : DialogFragment() {
         spinner = binding.spinner
 
         spinner.adapter = setSpinnerAdapter()
-        var selectPos: Int =  spinner.adapter.count
-        spinner.setSelection(selectPos)
+        spinner.setSelection(0)
         spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                when (position) {
-                    0 -> {
-                        selectPos = position
-                    }
-                    1 -> {
-                        selectPos = position
-                    }
-                    2 -> {
-                        selectPos = position
-                    }
-                    else -> {
-                        spinner.setSelection(0)
-                    }
-                }
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                spinner.setSelection(0)
-            }
-        }
+        setSelectedListener()
 
         binding.btnConfirm.setOnClickListener {
 
@@ -69,6 +43,31 @@ class SelectDialog : DialogFragment() {
         return binding.root
     }
 
+    private fun setSelectedListener(){
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                adapterView: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                when (position) {
+                    0 -> {
+                    }
+                    1 -> {
+                    }
+                    2 -> {
+                    }
+                    else -> {
+                    }
+                }
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {
+                spinner.setSelection(0)
+            }
+        }
+    }
 
     private fun setSpinnerAdapter(): SpinnerAdapter {
         val spinnerAdapter =
@@ -99,7 +98,7 @@ class SelectDialog : DialogFragment() {
         return spinnerAdapter
     }
 
-    private fun dipToPixels(dipValue: Float): Float{
+    private fun dipToPixels(dipValue: Float): Float {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             dipValue,
