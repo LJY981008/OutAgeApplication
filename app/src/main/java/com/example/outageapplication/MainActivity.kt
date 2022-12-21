@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -20,6 +21,7 @@ import com.example.outageapplication.FrameFragment.FacilityFragment
 import com.example.outageapplication.FrameFragment.QualityFragment
 import com.example.outageapplication.FrameFragment.RecordFragment
 import com.example.outageapplication.databinding.ActivityMainBinding
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.naver.maps.geometry.LatLng
@@ -30,6 +32,7 @@ import com.naver.maps.map.util.FusedLocationSource
 class MainActivity : AppCompatActivity() {
     companion object{
         lateinit var mainContext: MainActivity
+        lateinit var fabBtn: FloatingActionButton
     }
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewPager: ViewPager2
@@ -46,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         mainContext = this
         viewPager = binding.viewPager
         tabLayout = binding.tabLayout
-
+        fabBtn = binding.fabMain
 
         if(isPermitted()) {
         }
@@ -61,9 +64,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        binding.fabMain.setOnClickListener {
+        /*binding.fabMain.setOnClickListener {
             toggleFab()
-        }
+        }*/
 
     }
 

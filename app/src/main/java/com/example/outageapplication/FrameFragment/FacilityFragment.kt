@@ -1,6 +1,4 @@
 package com.example.outageapplication.FrameFragment
-import androidx.appcompat.app.AlertDialog
-import android.content.DialogInterface
 
 import android.graphics.Color
 import android.location.Address
@@ -15,6 +13,7 @@ import com.example.outageapplication.Data.FacilityBody
 import com.example.outageapplication.Interface.RetrofitFacilityObject
 import com.example.outageapplication.MainActivity
 import com.example.outageapplication.Util.LoadingDialog
+import com.example.outageapplication.Util.SelectDialog
 import com.example.outageapplication.databinding.FragmentFacilityBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
@@ -40,7 +39,8 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     private var mapData: MutableList<Map<String, String>> = arrayListOf()
     private lateinit var locationSource: FusedLocationSource
     private var geocoder = Geocoder(MainActivity.mainContext)
-    private val dialog = LoadingDialog()
+    private val loadingDialog = LoadingDialog()
+    private val selectDialog= SelectDialog()
     //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreateView(
@@ -51,9 +51,15 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-        locationSource = FusedLocationSource(this, 1000)
-        dialog.show(this.childFragmentManager, "tag")
+        //locationSource = FusedLocationSource(this, 1000)
+
+        loadingDialog.show(this.childFragmentManager, "loading")
         getMapFacilityData()
+
+        MainActivity.fabBtn.setOnClickListener {
+            selectDialog.show(this.childFragmentManager, "select")
+        }
+
         return binding.root
     }
 
@@ -98,7 +104,7 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
             markers.add(tmpMarker)
         }
 
-        dialog.dismiss()
+        loadingDialog.dismiss()
 
     }
 
