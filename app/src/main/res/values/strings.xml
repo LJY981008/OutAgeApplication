@@ -2,6 +2,7 @@
     <string name="app_name">OutAgeApplication</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <style name="SpinnerDivideStyle" parent="android:style/Widget.ListView.DropDown">
         <item name="android:divider">#000000</item> <!-- divider 색 -->
         <item name="android:dividerHeight">2dp</item> <!-- divider 높이 -->

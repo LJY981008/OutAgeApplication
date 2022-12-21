@@ -12,12 +12,15 @@ import androidx.fragment.app.Fragment
 import com.example.outageapplication.Data.FacilityBody
 import com.example.outageapplication.Interface.RetrofitFacilityObject
 import com.example.outageapplication.MainActivity
-import com.example.outageapplication.Util.LoadingDialog
-import com.example.outageapplication.Util.SelectDialog
+import com.example.outageapplication.Util.DistanceManager
+import com.example.outageapplication.Dialog.LoadingDialog
+import com.example.outageapplication.Dialog.MarkerInfoDialog
+import com.example.outageapplication.Dialog.SelectDialog
 import com.example.outageapplication.databinding.FragmentFacilityBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.naver.maps.map.util.MarkerIcons
 import retrofit2.Call
@@ -31,8 +34,9 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     }
 
     private val marker = Marker()
-    private var markers:MutableList<Marker> = arrayListOf()
-
+    private var markers: MutableList<Marker> = arrayListOf()
+    private var standardLatitude = 37.5125            //기준경도
+    private var standardLongitude = 127.102778        //기준위도
 
     private lateinit var binding: FragmentFacilityBinding
     private lateinit var mapView: MapView
@@ -40,7 +44,8 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationSource: FusedLocationSource
     private var geocoder = Geocoder(MainActivity.mainContext)
     private val loadingDialog = LoadingDialog()
-    private val selectDialog= SelectDialog()
+    private val selectDialog = SelectDialog()
+    private val markerInfoDialog = MarkerInfoDialog()
     //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onCreateView(
@@ -52,10 +57,8 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
         //locationSource = FusedLocationSource(this, 1000)
-
         loadingDialog.show(this.childFragmentManager, "loading")
         getMapFacilityData()
-
         MainActivity.fabBtn.setOnClickListener {
             selectDialog.show(this.childFragmentManager, "select")
         }
@@ -91,24 +94,40 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
      * 호출한 데이터 지도에 적용
      */
     private fun setMap(content: FacilityBody) {
-
-
         content.data.forEach {
             mapData.add(it.getFacilityMap())
             var trans = transAddress(it.address)
+            var distance =
+                DistanceManager.getDistance(
+                    standardLatitude,
+                    standardLongitude,
+                    trans.latitude,
+                    trans.longitude
+                )
             val tmpMarker = Marker()
+            tmpMarker.isIconPerspectiveEnabled = true
             tmpMarker.position = LatLng(trans.latitude, trans.longitude)
             tmpMarker.map = naverMap
             tmpMarker.icon = MarkerIcons.BLUE
             tmpMarker.iconTintColor = Color.BLUE
+            tmpMarker.onClickListener = Overlay.OnClickListener { _ ->
+                val bundle = Bundle()
+                bundle.putString("Name", it.getFacilityMap()["BuildName"])
+                bundle.putString("Division", it.getFacilityMap()["Division"])
+                bundle.putString("Scale", it.getFacilityMap()["Scale"])
+                bundle.putString("Address", it.getFacilityMap()["Address"])
+                bundle.putInt("Distance", distance)
+                markerInfoDialog.arguments = bundle
+                markerInfoDialog.show(this.childFragmentManager, "info")
+                false
+            }
             markers.add(tmpMarker)
         }
-
         loadingDialog.dismiss()
 
     }
 
-    fun transAddress(address: String): Address {
+    private fun transAddress(address: String): Address {
         val cor = geocoder.getFromLocationName(address, 1)
         return cor[0]
     }
@@ -116,8 +135,7 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(nMap: NaverMap) {
         naverMap = nMap
-        var standardLatitude = 37.5125            //기준경도
-        var standardLongitude = 127.102778        //기준위도
+
         var camPos = CameraPosition(
             LatLng(standardLatitude, standardLongitude),
             10.0

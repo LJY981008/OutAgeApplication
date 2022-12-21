@@ -1,4 +1,4 @@
-package com.example.outageapplication.Util
+package com.example.outageapplication.Dialog
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

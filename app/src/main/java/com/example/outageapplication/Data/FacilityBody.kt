@@ -25,7 +25,7 @@ data class Facility(
 ){
 
     fun getFacilityMap(): Map<String, String> {
-        var map = mapOf<String, String>(
+        return mapOf(
             "Scale" to scale,
             "Date" to date,
             "Quality" to quality,
@@ -37,6 +37,5 @@ data class Facility(
             "CompletionDate" to completionDate,
             "AppointedDate" to appointedDate
         )
-        return map
     }
 }
