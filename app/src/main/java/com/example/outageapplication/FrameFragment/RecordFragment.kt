@@ -34,6 +34,7 @@ class RecordFragment : Fragment() {
     private val pageCount = 1           // 표시할 페이지 수
     private val itemList = mutableListOf<RecordItem>()
     private var local = "전체"
+    private var isRecent = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,7 +82,8 @@ class RecordFragment : Fragment() {
             itemList.add(RecordItem(it.getRecordMap()))
         }
         itemList.sortBy { it.getStartDate() }       // 단수 시작일 기준으로 정렬
-        itemList.reverse()          // 최상위에 가장 최신의 정보
+        if(isRecent)                                // 최신순으로 설정한 경우 최상위에 가장 최신의 정보 표시
+            itemList.reverse()          
 
         if (local == "전체")                          // 지역 선택의 경우 필터링
             adapter.datas = itemList
@@ -114,8 +116,9 @@ class RecordFragment : Fragment() {
             selectRecordDialog.show(this.childFragmentManager, "select")
             selectRecordDialog.setOnClickListener(object :
                 SelectRecordDialog.OnDialogClickListener {
-                override fun onClicked(tmp: String) {
+                override fun onClicked(tmp: String, tmpRecent: Boolean) {
                     local = tmp
+                    isRecent = tmpRecent
                     getRecordData()
                 }
             })

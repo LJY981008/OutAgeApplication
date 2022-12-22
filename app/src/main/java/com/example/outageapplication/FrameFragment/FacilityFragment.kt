@@ -3,6 +3,7 @@ package com.example.outageapplication.FrameFragment
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -41,7 +42,6 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentFacilityBinding
     private lateinit var mapView: MapView
     private var mapData: MutableList<Map<String, String>> = arrayListOf()
-    private lateinit var locationSource: FusedLocationSource
     private var geocoder = Geocoder(MainActivity.mainContext)
     private val loadingDialog = LoadingDialog()
     private val selectFacilityDialog = SelectFacilityDialog()
@@ -58,71 +58,55 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         //locationSource = FusedLocationSource(this, 1000)
-        loadingDialog.show(this.childFragmentManager, "loading")
-        getMapFacilityData()
+        //loadingDialog.show(this.childFragmentManager, "loading")
+
 
         return binding.root
     }
 
-    /**
-     * 급수시설 호출
-     */
-    private fun getMapFacilityData() {
-        RetrofitFacilityObject.getApiFacilityService().getInfo(10, 1)
-            .enqueue(object : Callback<FacilityBody> {
-                override fun onResponse(
-                    call: Call<FacilityBody>,
-                    response: Response<FacilityBody>
-                ) {
-                    Log.d("성공", response.message() + response.code())
-                    if (response.code() == 200) {
-                        setMap(response.body()!!)
-                    }
-                }
-
-                override fun onFailure(call: Call<FacilityBody>, t: Throwable) {
-                    Log.d("실패", t.message.toString())
-                }
-
-            })
-    }
 
     /**
      * 호출한 데이터 지도에 적용
      */
-    private fun setMap(content: FacilityBody) {
+    private fun setMap(location: String, content: FacilityBody) {
+
         content.data.forEach {
-            mapData.add(it.getFacilityMap())
-            var trans = transAddress(it.address)
-            var distance =
-                DistanceManager.getDistance(
-                    standardLatitude,
-                    standardLongitude,
-                    trans.latitude,
-                    trans.longitude
-                )
-            val tmpMarker = Marker()
-            tmpMarker.isIconPerspectiveEnabled = true
-            tmpMarker.position = LatLng(trans.latitude, trans.longitude)
-            tmpMarker.map = naverMap
-            tmpMarker.icon = MarkerIcons.BLUE
-            tmpMarker.iconTintColor = Color.BLUE
-            tmpMarker.onClickListener = Overlay.OnClickListener { _ ->
-                val bundle = Bundle()
-                bundle.putString("Name", it.getFacilityMap()["BuildName"])
-                bundle.putString("Division", it.getFacilityMap()["Division"])
-                bundle.putString("Scale", it.getFacilityMap()["Scale"])
-                bundle.putString("Address", it.getFacilityMap()["Address"])
-                bundle.putInt("Distance", distance)
-                markerInfoDialog.arguments = bundle
-                markerInfoDialog.show(this.childFragmentManager, "info")
-                false
+            try {
+                if (it.getDetailLocation() == location) {
+                    Log.d("이프", it.address)
+                    mapData.add(it.getFacilityMap())
+                    var trans = transAddress(it.address)
+                    var distance =
+                        DistanceManager.getDistance(
+                            standardLatitude,
+                            standardLongitude,
+                            trans.latitude,
+                            trans.longitude
+                        )
+                    val tmpMarker = Marker()
+                    tmpMarker.isIconPerspectiveEnabled = true
+                    tmpMarker.position = LatLng(trans.latitude, trans.longitude)
+                    tmpMarker.map = naverMap
+                    tmpMarker.icon = MarkerIcons.BLUE
+                    tmpMarker.iconTintColor = Color.BLUE
+                    tmpMarker.onClickListener = Overlay.OnClickListener { _ ->
+                        val bundle = Bundle()
+                        bundle.putString("Name", it.getFacilityMap()["BuildName"])
+                        bundle.putString("Division", it.getFacilityMap()["Division"])
+                        bundle.putString("Scale", it.getFacilityMap()["Scale"])
+                        bundle.putString("Address", it.getFacilityMap()["Address"])
+                        bundle.putInt("Distance", distance)
+                        markerInfoDialog.arguments = bundle
+                        markerInfoDialog.show(this.childFragmentManager, "info")
+                        false
+                    }
+                    markers.add(tmpMarker)
+                }
+            } catch (e: Exception) {
+                Log.d("익셉", e.message.toString())
             }
 
-            markers.add(tmpMarker)
         }
-        loadingDialog.dismiss()
-
     }
 
     /**
@@ -139,6 +123,9 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
      */
     override fun onMapReady(nMap: NaverMap) {
         naverMap = nMap
+        naverMap.uiSettings.isZoomControlEnabled = false
+        naverMap.uiSettings.isScaleBarEnabled = false
+        naverMap.uiSettings.isLogoClickEnabled = false
 
         var camPos = CameraPosition(
             LatLng(standardLatitude, standardLongitude),
@@ -146,10 +133,10 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
         )
         naverMap.cameraPosition = camPos
         // 기준위치에 마커 표시
-        marker.position = LatLng(standardLatitude, standardLongitude)
+        /*marker.position = LatLng(standardLatitude, standardLongitude)
         marker.map = naverMap
         marker.icon = MarkerIcons.BLACK
-        marker.iconTintColor = Color.RED
+        marker.iconTintColor = Color.RED*/
 
         // 현재 내위치에 마커 찍는 기능
         /*fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.mainContext) //gps 자동으로 받아오기
@@ -180,8 +167,22 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
+        //loadingDialog.show(childFragmentManager, "loading")
         MainActivity.fabBtn.setOnClickListener {
             selectFacilityDialog.show(this.childFragmentManager, "select")
+            selectFacilityDialog.setOnClickListener(object :
+                SelectFacilityDialog.OnDialogClickListener {
+                override fun onClicked(location: String, facility: FacilityBody) {
+                    selectFacilityDialog.dismiss()
+                    markers.forEach {
+                        it.map = null
+                    }
+                    markers.clear()
+
+                    setMap(location, facility)
+                }
+
+            })
         }
     }
 }

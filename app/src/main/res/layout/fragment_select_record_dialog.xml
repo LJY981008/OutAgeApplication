@@ -7,9 +7,9 @@
     android:background="@android:color/transparent">
 
     <LinearLayout
-        android:background="#f5f5f5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#f5f5f5"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,21 +18,40 @@
 
         <TextView
             android:id="@+id/text"
-            android:textColor="@color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:text="항목 선택" />
+            android:text="항목 선택"
+            android:textColor="@color/black" />
 
         <Spinner
-            android:background="@drawable/spinner_background"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="30dp"
             android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/spinner_background" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/radioRecent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:text="최신순"/>
+            <RadioButton
+                android:id="@+id/radioOld"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:text="오래된순"/>
+        </RadioGroup>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -40,20 +59,21 @@
             android:orientation="horizontal">
 
             <Button
-                android:layout_marginRight="15dp"
                 android:id="@+id/btnConfirm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginRight="15dp"
                 android:background="@android:color/transparent"
                 android:text="확인"
                 android:textColor="@color/black" />
+
             <Button
-                android:layout_marginLeft="15dp"
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginLeft="15dp"
                 android:background="@android:color/transparent"
                 android:text="취소"
                 android:textColor="@color/black" />

@@ -18,6 +18,7 @@ class SelectRecordDialog : DialogFragment() {
     private lateinit var spinner: Spinner
     private lateinit var localList: ArrayList<String>
     private lateinit var onClickListener: OnDialogClickListener
+    private var isRecent = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -27,14 +28,16 @@ class SelectRecordDialog : DialogFragment() {
         val bundle = arguments
         localList = bundle!!.getStringArrayList("localList") as ArrayList<String>
 
+        setRadioListener()
+        
         spinner = binding.spinner
         spinner.adapter = setSpinnerAdapter()
         spinner.setSelection(0)
         spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
         setSelectedListener()
-
+        
         binding.btnConfirm.setOnClickListener {
-            onClickListener.onClicked(spinner.selectedItem as String)
+            onClickListener.onClicked(spinner.selectedItem as String, isRecent)
             this.dismiss()
         }
         binding.btnCancel.setOnClickListener {
@@ -45,7 +48,28 @@ class SelectRecordDialog : DialogFragment() {
         return binding.root
     }
 
-    private fun setSelectedListener(){
+    /**
+     * 라디오버튼 선택 이벤트
+     */
+    private fun setRadioListener() {
+        binding.radioGroup.check(binding.radioRecent.id)
+        binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
+            when (checkedId) {
+                binding.radioRecent.id -> {
+                    isRecent = true
+                }
+                binding.radioOld.id -> {
+                    isRecent = false
+                }
+                else -> {}
+            }
+
+        }
+    }
+    /**
+     * 스피너 선택 이벤트
+     */
+    private fun setSelectedListener() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 adapterView: AdapterView<*>?,
@@ -71,6 +95,9 @@ class SelectRecordDialog : DialogFragment() {
         }
     }
 
+    /**
+     * 스피너 어뎁터
+     */
     private fun setSpinnerAdapter(): SpinnerAdapter {
         val spinnerAdapter =
             object : ArrayAdapter<String>(MainActivity.mainContext, R.layout.item_spinner) {
@@ -107,11 +134,12 @@ class SelectRecordDialog : DialogFragment() {
             resources.displayMetrics
         )
     }
-    fun setOnClickListener(listener: OnDialogClickListener){
+
+    fun setOnClickListener(listener: OnDialogClickListener) {
         onClickListener = listener
     }
-    interface OnDialogClickListener
-    {
-        fun onClicked(name: String)
+
+    interface OnDialogClickListener {
+        fun onClicked(name: String, isRecent: Boolean)
     }
 }

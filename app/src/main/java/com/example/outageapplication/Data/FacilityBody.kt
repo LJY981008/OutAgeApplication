@@ -23,7 +23,9 @@ data class Facility(
     @SerializedName("준공일자") val completionDate:String,
     @SerializedName("지정일자") val appointedDate:String,
 ){
-
+    fun getDetailLocation():String{
+        return dong.substring(0 until 2)
+    }
     fun getFacilityMap(): Map<String, String> {
         return mapOf(
             "Scale" to scale,

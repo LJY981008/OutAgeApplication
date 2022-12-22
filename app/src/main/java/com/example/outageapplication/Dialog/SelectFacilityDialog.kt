@@ -1,23 +1,33 @@
 package com.example.outageapplication.Dialog
 
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
+import com.example.outageapplication.Data.Facility
+import com.example.outageapplication.Data.FacilityBody
+import com.example.outageapplication.Interface.RetrofitFacilityObject
 import com.example.outageapplication.MainActivity
 import com.example.outageapplication.R
 import com.example.outageapplication.databinding.FragmentSelectFacilityDialogBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SelectFacilityDialog : DialogFragment() {
     private lateinit var binding: FragmentSelectFacilityDialogBinding
     private lateinit var spinner: Spinner
+    private lateinit var spinnerDetail: Spinner
+    private lateinit var onClickListener: OnDialogClickListener
+    private lateinit var facility:FacilityBody
+    private val loadingDialog = LoadingDialog()
+    private var listLocation = mutableListOf<String>()
     private var items = arrayOf(
         "송파구",
-        "1",
-        "2"
     )
 
     override fun onCreateView(
@@ -26,23 +36,56 @@ class SelectFacilityDialog : DialogFragment() {
     ): View? {
         binding = FragmentSelectFacilityDialogBinding.inflate(inflater, container, false)
         spinner = binding.spinner
+        spinnerDetail = binding.spinnerDetail
 
-        spinner.adapter = setSpinnerAdapter()
+        spinner.adapter = setSpinnerLocationAdapter()
         spinner.setSelection(0)
         spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
+        getMapFacilityData(spinner.selectedItem as String)
         setSelectedListener()
+        
+        //여기
+        // 현재 fab을 눌러서 확인을 눌러도 마커가 안찍힘
+        // 주소도 저장 방식 변경
 
-        binding.btnConfirm.setOnClickListener {
-
-        }
-        binding.btnCancel.setOnClickListener {
-            this.dismiss()
-        }
 
         return binding.root
     }
 
-    private fun setSelectedListener(){
+    /**
+     * 급수시설 호출
+     */
+    private fun getMapFacilityData(selectLocation: String) {
+        RetrofitFacilityObject.getApiFacilityService().getInfo(94, 1)
+            .enqueue(object : Callback<FacilityBody> {
+                override fun onResponse(
+                    call: Call<FacilityBody>,
+                    response: Response<FacilityBody>
+                ) {
+
+                    if (response.code() == 200) {
+                        facility = response.body()!!
+                        detailLocation(response.body()!!)
+                    }
+                }
+
+                override fun onFailure(call: Call<FacilityBody>, t: Throwable) {
+                    Log.d("실패", t.message.toString())
+                }
+
+            })
+    }
+
+    private fun detailLocation(contents: FacilityBody) {
+        contents.data.forEach {
+            listLocation.add(it.getDetailLocation())
+        }
+        var listDetail: List<String> = listLocation.distinct()
+        setSpinnerDetailLocationAdapter(listDetail)
+    }
+
+
+    private fun setSelectedListener() {
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 adapterView: AdapterView<*>?,
@@ -50,16 +93,7 @@ class SelectFacilityDialog : DialogFragment() {
                 position: Int,
                 id: Long
             ) {
-                when (position) {
-                    0 -> {
-                    }
-                    1 -> {
-                    }
-                    2 -> {
-                    }
-                    else -> {
-                    }
-                }
+                getMapFacilityData(spinner.selectedItem as String)
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {
@@ -68,32 +102,21 @@ class SelectFacilityDialog : DialogFragment() {
         }
     }
 
-    private fun setSpinnerAdapter(): SpinnerAdapter {
+    private fun setSpinnerDetailLocationAdapter(list: List<String>) {
         val spinnerAdapter =
             object : ArrayAdapter<String>(MainActivity.mainContext, R.layout.item_spinner) {
+            }
+        spinnerAdapter.addAll(list)
+        spinnerDetail.adapter = spinnerAdapter
+        spinnerDetail.setSelection(0)
+        spinnerDetail.dropDownVerticalOffset = dipToPixels(45f).toInt()
+    }
 
-                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-
-                    val v = super.getView(position, convertView, parent)
-
-                    if (position == count) {
-                        //마지막 포지션의 textView 를 힌트 용으로 사용합니다.
-                        (v.findViewById<View>(R.id.tvItemSpinner) as TextView).text = ""
-                        //아이템의 마지막 값을 불러와 hint로 추가해 줍니다.
-                        (v.findViewById<View>(R.id.tvItemSpinner) as TextView).hint = getItem(count)
-                    }
-
-                    return v
-                }
-
-                override fun getCount(): Int {
-                    //마지막 아이템은 힌트용으로만 사용하기 때문에 getCount에 1을 빼줍니다.
-                    return super.getCount() - 1
-                }
-
+    private fun setSpinnerLocationAdapter(): SpinnerAdapter {
+        val spinnerAdapter =
+            object : ArrayAdapter<String>(MainActivity.mainContext, R.layout.item_spinner) {
             }
         spinnerAdapter.addAll(items.toMutableList())
-        spinnerAdapter.add("지역 선택")
         return spinnerAdapter
     }
 
@@ -103,5 +126,28 @@ class SelectFacilityDialog : DialogFragment() {
             dipValue,
             resources.displayMetrics
         )
+    }
+
+    fun setOnClickListener(listener: OnDialogClickListener) {
+        onClickListener = listener
+    }
+
+    interface OnDialogClickListener {
+        fun onClicked(name: String, facility :FacilityBody)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.btnConfirm.setOnClickListener {
+
+            facility.data.forEach {
+                Log.d("???", it.address)
+            }
+            val a = spinnerDetail.selectedItem.toString()
+            onClickListener.onClicked(a, facility)
+        }
+        binding.btnCancel.setOnClickListener {
+            this.dismiss()
+        }
     }
 }

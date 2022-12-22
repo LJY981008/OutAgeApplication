@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        supportActionBar?.title = "위기 대응 프로젝트"
         mainContext = this
         viewPager = binding.viewPager
         tabLayout = binding.tabLayout
