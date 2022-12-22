@@ -1,12 +1,14 @@
 package com.example.outageapplication.Dialog
 
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
+import com.example.outageapplication.FrameFragment.RecordFragment
 import com.example.outageapplication.MainActivity
 import com.example.outageapplication.R
 import com.example.outageapplication.databinding.FragmentSelectRecordDialogBinding
@@ -14,28 +16,29 @@ import com.example.outageapplication.databinding.FragmentSelectRecordDialogBindi
 class SelectRecordDialog : DialogFragment() {
     private lateinit var binding: FragmentSelectRecordDialogBinding
     private lateinit var spinner: Spinner
-    private var items = arrayOf(
-        "단양군",
-        "1",
-        "2"
-    )
-
+    private lateinit var localList: ArrayList<String>
+    private lateinit var onClickListener: OnDialogClickListener
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSelectRecordDialogBinding.inflate(inflater, container, false)
-        spinner = binding.spinner
 
+        val bundle = arguments
+        localList = bundle!!.getStringArrayList("localList") as ArrayList<String>
+
+        spinner = binding.spinner
         spinner.adapter = setSpinnerAdapter()
         spinner.setSelection(0)
         spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
         setSelectedListener()
 
         binding.btnConfirm.setOnClickListener {
-
+            onClickListener.onClicked(spinner.selectedItem as String)
+            this.dismiss()
         }
         binding.btnCancel.setOnClickListener {
+
             this.dismiss()
         }
 
@@ -92,7 +95,7 @@ class SelectRecordDialog : DialogFragment() {
                 }
 
             }
-        spinnerAdapter.addAll(items.toMutableList())
+        spinnerAdapter.addAll(localList.toMutableList())
         spinnerAdapter.add("지역 선택")
         return spinnerAdapter
     }
@@ -103,5 +106,12 @@ class SelectRecordDialog : DialogFragment() {
             dipValue,
             resources.displayMetrics
         )
+    }
+    fun setOnClickListener(listener: OnDialogClickListener){
+        onClickListener = listener
+    }
+    interface OnDialogClickListener
+    {
+        fun onClicked(name: String)
     }
 }

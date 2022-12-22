@@ -6,4 +6,7 @@ data class RecordItem(
     fun getStartDate(): String {
         return data["startDate"]!!
     }
+    fun getLocal(): String {
+        return data["local"]!!
+    }
 }

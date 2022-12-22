@@ -1,6 +1,7 @@
 package com.example.outageapplication.Adapter
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.outageapplication.Data.RecordItem
+import com.example.outageapplication.Dialog.RecordInfoDialog
+import com.example.outageapplication.FrameFragment.RecordFragment
+import com.example.outageapplication.MainActivity
 import com.example.outageapplication.R
 
 class RecordAdapter(private val context: Context) : RecyclerView.Adapter<RecordAdapter.ViewHolder>() {
@@ -29,11 +33,19 @@ class RecordAdapter(private val context: Context) : RecyclerView.Adapter<RecordA
         private val v = view
         private val textCause: TextView = view.findViewById(R.id.tvCause)
         private val textDate: TextView = view.findViewById(R.id.tvDate)
+        private val recordInfoDialog = RecordInfoDialog()
         fun bind(item: RecordItem) {
             textCause.text = item.data["cause"]
             textDate.text = item.data["startDate"]
             v.setOnClickListener {
-
+                val bundle = Bundle()
+                bundle.putString("Cause", item.data["cause"])
+                bundle.putString("Start", item.data["startDate"])
+                bundle.putString("End", item.data["endDate"])
+                bundle.putString("Address", item.data["address"])
+                bundle.putString("Contents", item.data["corporationContents"])
+                recordInfoDialog.arguments = bundle
+                recordInfoDialog.show(MainActivity.mainContext.supportFragmentManager, "info")
             }
         }
     }

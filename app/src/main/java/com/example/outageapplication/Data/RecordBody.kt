@@ -37,7 +37,7 @@ data class Record(
             "startTime" to startTime,
             "endDate" to endDate,
             "endTime" to endTime,
-            "corporation" to corporation
+            "corporationContents" to corporationContents
         )
     }
 }
