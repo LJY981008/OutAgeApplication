@@ -19,9 +19,15 @@ android {
         buildConfigField "String", "URL_WaterQuality", properties["url.WaterQuality"]
         buildConfigField "String", "ENDPOINT_GET_WaterQuality_STATUS", properties["endPoint.getWaterQualityStatus"]
         buildConfigField "String", "API_KEY", properties["api.key"]
+
         buildConfigField "String", "URL_Facility", properties["url.WaterSupplyFacility"]
         buildConfigField "String", "ENDPOINT_GET_FACILITY_STATUS", properties["endPoint.getWaterSupplyFacilityStatus"]
         buildConfigField "String", "API_FACILITY_KEY", properties["api.WaterSupplyFacilityKey"]
+
+        buildConfigField "String", "URL_Record", properties["url.Record"]
+        buildConfigField "String", "ENDPOINT_GET_RECORD_STATUS", properties["endPoint.getRecordStatus"]
+        buildConfigField "String", "API_RECORD_KEY", properties["api.recordKey"]
+
     }
 
     buildTypes {

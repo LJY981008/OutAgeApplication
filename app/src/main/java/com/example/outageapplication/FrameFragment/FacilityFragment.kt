@@ -15,7 +15,7 @@ import com.example.outageapplication.MainActivity
 import com.example.outageapplication.Util.DistanceManager
 import com.example.outageapplication.Dialog.LoadingDialog
 import com.example.outageapplication.Dialog.MarkerInfoDialog
-import com.example.outageapplication.Dialog.SelectDialog
+import com.example.outageapplication.Dialog.SelectFacilityDialog
 import com.example.outageapplication.databinding.FragmentFacilityBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
@@ -44,7 +44,7 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationSource: FusedLocationSource
     private var geocoder = Geocoder(MainActivity.mainContext)
     private val loadingDialog = LoadingDialog()
-    private val selectDialog = SelectDialog()
+    private val selectFacilityDialog = SelectFacilityDialog()
     private val markerInfoDialog = MarkerInfoDialog()
     //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
@@ -56,12 +56,10 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
         //locationSource = FusedLocationSource(this, 1000)
         loadingDialog.show(this.childFragmentManager, "loading")
         getMapFacilityData()
-        MainActivity.fabBtn.setOnClickListener {
-            selectDialog.show(this.childFragmentManager, "select")
-        }
 
         return binding.root
     }
@@ -70,7 +68,6 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
      * 급수시설 호출
      */
     private fun getMapFacilityData() {
-        Log.d("함수", "호출")
         RetrofitFacilityObject.getApiFacilityService().getInfo(10, 1)
             .enqueue(object : Callback<FacilityBody> {
                 override fun onResponse(
@@ -121,18 +118,25 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
                 markerInfoDialog.show(this.childFragmentManager, "info")
                 false
             }
+
             markers.add(tmpMarker)
         }
         loadingDialog.dismiss()
 
     }
 
+    /**
+     * 주소 경위도로 변환
+     */
     private fun transAddress(address: String): Address {
         val cor = geocoder.getFromLocationName(address, 1)
         return cor[0]
     }
 
-
+    /**
+     * 기준 위치에 마커표시
+     * GPS위치로 사용 예정
+     */
     override fun onMapReady(nMap: NaverMap) {
         naverMap = nMap
 
@@ -172,5 +176,12 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
             }
             addOnLocationChangeListener() //위치변경
         }*/
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MainActivity.fabBtn.setOnClickListener {
+            selectFacilityDialog.show(this.childFragmentManager, "select")
+        }
     }
 }

@@ -9,13 +9,13 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import com.example.outageapplication.MainActivity
 import com.example.outageapplication.R
-import com.example.outageapplication.databinding.FragmentSelectDialogBinding
+import com.example.outageapplication.databinding.FragmentSelectRecordDialogBinding
 
-class SelectDialog : DialogFragment() {
-    private lateinit var binding: FragmentSelectDialogBinding
+class SelectRecordDialog : DialogFragment() {
+    private lateinit var binding: FragmentSelectRecordDialogBinding
     private lateinit var spinner: Spinner
     private var items = arrayOf(
-        "송파구",
+        "단양군",
         "1",
         "2"
     )
@@ -24,7 +24,7 @@ class SelectDialog : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSelectDialogBinding.inflate(inflater, container, false)
+        binding = FragmentSelectRecordDialogBinding.inflate(inflater, container, false)
         spinner = binding.spinner
 
         spinner.adapter = setSpinnerAdapter()
