@@ -33,7 +33,6 @@ class DroughtFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDroughtBinding.inflate(inflater, container, false)
-        MainActivity.fabBtn.visibility = View.GONE
         rvDought = binding.rvDought
         adapter = SearchAdapter(this.requireContext())
         binding.rvDought.adapter = adapter
@@ -82,9 +81,5 @@ class DroughtFragment : Fragment() {
     }
 
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        MainActivity.fabBtn.visibility = View.VISIBLE
-    }
 
 }

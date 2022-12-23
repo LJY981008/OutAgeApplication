@@ -1,23 +1,27 @@
 package com.example.outageapplication
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.outageapplication.FrameFragment.FacilityFragment
 import com.example.outageapplication.FrameFragment.DroughtFragment
+import com.example.outageapplication.FrameFragment.FacilityFragment
 import com.example.outageapplication.FrameFragment.RecordFragment
 import com.example.outageapplication.databinding.ActivityMainBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+
 
 class MainActivity : AppCompatActivity() {
     companion object{
@@ -27,8 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
-    private var isFabOpen = false
-    private val tabTextList = arrayListOf("시설", "이력", "조회")
+    private val tabTextList = arrayListOf("급수시설", "단수이력", "가뭄수치")
     var permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,16 +57,29 @@ class MainActivity : AppCompatActivity() {
         adapter.addFragment(DroughtFragment())
         viewPager.adapter = adapter
         viewPager.isUserInputEnabled = false    // 스와이프 방지
+        tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) { // 선택 X -> 선택 O
+                when(tab.position){
+                  2 -> {
+                      fabBtn.hide()
+                      fabBtn.visibility = View.GONE
+                  }
+                  else -> {
+                      fabBtn.show()
+                      fabBtn.visibility = View.VISIBLE
+                  }
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) { // 선택 O -> 선택
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab) { // 선택 O -> 선택 O
+            }
+        })
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabTextList[position]
         }.attach()
-
-
-
-        /*binding.fabMain.setOnClickListener {
-            toggleFab()
-        }*/
-
     }
 
     private fun isPermitted(): Boolean {
@@ -73,21 +89,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
-    }
-
-    private fun toggleFab(){
-        if(isFabOpen){
-            ObjectAnimator.ofFloat(binding.fabA, "translationY", 0f).apply { start() }
-            ObjectAnimator.ofFloat(binding.fabB, "translationY", 0f).apply { start() }
-            isFabOpen = false;
-            //binding.fabMain.setImageResource(R.drawable.) 눌렀을 때 바뀔 이미지 구하기
-        }
-        else{
-            ObjectAnimator.ofFloat(binding.fabA, "translationY", -200f).apply { start() }
-            ObjectAnimator.ofFloat(binding.fabB, "translationY", -400f).apply { start() }
-            isFabOpen = true
-            //binding.fabMain.setImageResource(R.drawable.) 눌렀을 때 바뀔 이미지 구하기
-        }
     }
 
     private inner class PagerFragmentStateAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity){
