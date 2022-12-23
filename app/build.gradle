@@ -16,9 +16,9 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "URL_WaterQuality", properties["url.WaterQuality"]
-        buildConfigField "String", "ENDPOINT_GET_WaterQuality_STATUS", properties["endPoint.getWaterQualityStatus"]
-        buildConfigField "String", "API_KEY", properties["api.key"]
+        buildConfigField "String", "URL_DROUGHT", properties["url.Drought"]
+        buildConfigField "String", "ENDPOINT_GET_DROUGHT_STATUS", properties["endPoint.getDroughtStatus"]
+        buildConfigField "String", "API_DROUGHT_KEY", properties["api.DroughtKey"]
 
         buildConfigField "String", "URL_Facility", properties["url.WaterSupplyFacility"]
         buildConfigField "String", "ENDPOINT_GET_FACILITY_STATUS", properties["endPoint.getWaterSupplyFacilityStatus"]

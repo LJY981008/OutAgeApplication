@@ -69,7 +69,6 @@ class FacilityFragment : Fragment(), OnMapReadyCallback {
      * 호출한 데이터 지도에 적용
      */
     private fun setMap(location: String, content: FacilityBody) {
-
         content.data.forEach {
             try {
                 if (it.getDetailLocation() == location) {

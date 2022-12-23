@@ -5,30 +5,19 @@ import android.animation.ObjectAnimator
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.outageapplication.FrameFragment.FacilityFragment
-import com.example.outageapplication.FrameFragment.QualityFragment
+import com.example.outageapplication.FrameFragment.DroughtFragment
 import com.example.outageapplication.FrameFragment.RecordFragment
 import com.example.outageapplication.databinding.ActivityMainBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.*
-import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.util.FusedLocationSource
 
 class MainActivity : AppCompatActivity() {
     companion object{
@@ -62,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         val adapter = PagerFragmentStateAdapter(this)
         adapter.addFragment(FacilityFragment())
         adapter.addFragment(RecordFragment())
-        adapter.addFragment(QualityFragment())
+        adapter.addFragment(DroughtFragment())
         viewPager.adapter = adapter
         viewPager.isUserInputEnabled = false    // 스와이프 방지
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
