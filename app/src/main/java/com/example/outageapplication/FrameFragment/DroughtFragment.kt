@@ -64,9 +64,12 @@ class DroughtFragment : Fragment() {
                     call: Call<DroughtBody>,
                     response: Response<DroughtBody>
                 ) {
-                    Log.d("성공", response.code().toString())
+
                     response.body()?.data?.forEach{
                         list.add(DroughtItem(it.getDroughtMap()))
+                    }
+                    list.forEach {
+                        Log.d("성공", it.data["local"].toString())
                     }
                     adapter.datas = list
                     adapter.saveDatas = list

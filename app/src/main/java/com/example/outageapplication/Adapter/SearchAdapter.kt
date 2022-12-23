@@ -1,6 +1,7 @@
 package com.example.outageapplication.Adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,18 +59,20 @@ class SearchAdapter(private val context: Context) :
                 datas = if (charString.isEmpty()) {
                     saveDatas
                 } else {
-                    var temp: String = ""
-                    val filteredList = ArrayList<DroughtItem>()
-                    for (item in saveDatas!!) {
-                        if (item!!.data["local"]!!.contains(charString)) {
-                            filteredList.add(item)
-                            temp = item.data["local"].toString()
-                        }
-                        if (item!!.data["step"]!!.contains(charString)) {
-                            if (item!!.data["local"] != temp)
-                                filteredList.add(item)
+                    val filteredList = mutableListOf<DroughtItem>()
+                    var isCheck = false
+                    saveDatas.forEach {
+                        if (it!!.data["local"]!!.contains(charString)) {
+                            filteredList.forEach { i->
+                                if(it.data["local"] == i.data["local"])
+                                    isCheck = true
+                            }
+                            if(!isCheck) {
+                                filteredList.add(it)
+                            }
                         }
                     }
+                    isCheck = false
                     filteredList
                 }
                 val filterResults = FilterResults()
